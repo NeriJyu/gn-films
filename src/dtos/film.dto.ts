@@ -40,7 +40,7 @@ export class CreateFilmDto {
 
   @IsNumber()
   @ApiProperty({
-    example: '145',
+    example: 145,
     description: 'Duration of the film in minutes',
   })
   time: number;
@@ -59,52 +59,40 @@ export class CreateFilmDto {
 }
 
 export class UpdateFilmDto {
-  @IsString()
-  @MaxLength(1000)
   @ApiProperty({
     example: 'A brief introduction to the film',
     description: 'Introduction of the film',
   })
   introduction: string;
 
-  @IsString()
-  @MaxLength(255)
   @ApiProperty({
-    example: 'Planeta Dos Macacos: O Reinado',
+    example: 'Garfield - Fora De Casa',
     description: 'Name of the film',
   })
   name: string;
 
-  @IsString()
-  @MaxLength(255)
   @ApiProperty({
-    example: 'Ação, Aventura',
+    example: 'Animação, Aventura',
     description: 'Genres of the film',
   })
   genre: string;
 
-  @IsString()
-  @MaxLength(255)
-  @ApiProperty({ example: 'Wes Ball', description: 'Director of the film' })
+  @ApiProperty({ example: 'Mark Dindal', description: 'Director of the film' })
   direction: string;
 
-  @IsNumber()
   @ApiProperty({
-    example: '145',
+    example: 102,
     description: 'Duration of the film in minutes',
   })
   time: number;
 
-  @IsBoolean()
   @ApiProperty({ example: true, description: 'If the film is in 3d' })
   is3d: boolean;
 
-  @IsBoolean()
   @ApiProperty({ example: true, description: 'If the film is dubbed' })
   dubbed: boolean;
 
-  @IsBoolean()
-  @ApiProperty({ example: true, description: 'If the film is subtitled' })
+  @ApiProperty({ example: false, description: 'If the film is subtitled' })
   subtitled: boolean;
 }
 

@@ -20,10 +20,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateFilmDto, FilmResponseDto, UpdateFilmDto } from 'src/dtos/film.dto';
+import {
+  CreateFilmDto,
+  FilmResponseDto,
+  UpdateFilmDto,
+} from 'src/dtos/film.dto';
 import { FilmModel } from 'src/models/film.model';
 import { AuthGuard } from 'src/utils/auth.guard';
-import { teste } from 'src/utils/bearer.util';
 import { Repository } from 'typeorm';
 
 @ApiTags('film')
