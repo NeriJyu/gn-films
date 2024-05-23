@@ -9,7 +9,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('/api');
   app.useGlobalPipes(new ValidationPipe());
-
+//
   await app.listen(3000);
 }
 bootstrap();
