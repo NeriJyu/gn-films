@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -17,6 +18,7 @@ import {
   UserResponseDto,
 } from 'src/dtos/user.dto';
 import { UserModel } from 'src/models/user.model';
+import { verifyToken } from 'src/utils/bearer.util';
 import { hashPassword } from 'src/utils/hash.util';
 import { Repository } from 'typeorm';
 
@@ -55,8 +57,11 @@ export class UserController {
   @Get(':id')
   public async getOne(
     @Param('id') id: number,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: UserResponseDto }> {
     try {
+      await verifyToken(authToken);
+
       const user = await this.model.findOne({ where: { id } });
 
       if (!user) throw new NotFoundException('User not found');
@@ -70,8 +75,12 @@ export class UserController {
   }
 
   @Get()
-  public async getAll(): Promise<{ data: UserResponseDto[] }> {
+  public async getAll(
+    @Headers('authorization') authToken: string,
+  ): Promise<{ data: UserResponseDto[] }> {
     try {
+      await verifyToken(authToken);
+
       const users = await this.model.find();
 
       if (users.length === 0) throw new NotFoundException('Users not found');
@@ -91,8 +100,11 @@ export class UserController {
   public async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: UserResponseDto }> {
     try {
+      await verifyToken(authToken);
+
       const userToUpdate = await this.model.findOne({ where: { id } });
 
       if (!userToUpdate) throw new NotFoundException('User not found');
@@ -120,8 +132,11 @@ export class UserController {
   @Delete(':id')
   public async delete(
     @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: string }> {
     try {
+      await verifyToken(authToken);
+
       const userToDelete = await this.model.findOne({ where: { id } });
 
       if (!userToDelete) throw new NotFoundException('User not found');

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -13,6 +14,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateFilmDto } from 'src/dtos/film.dto';
 import { FilmModel } from 'src/models/film.model';
+import { verifyToken } from 'src/utils/bearer.util';
 import { Repository } from 'typeorm';
 
 @Controller('/film')
@@ -24,8 +26,11 @@ export class FilmController {
   @Post()
   public async create(
     @Body() createFilmDto: CreateFilmDto,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: FilmModel }> {
     try {
+      await verifyToken(authToken);
+
       const filmCreated = await this.model.save(createFilmDto);
 
       return { data: filmCreated };
@@ -35,8 +40,13 @@ export class FilmController {
   }
 
   @Get(':id')
-  public async GetOne(@Param('id') id: number): Promise<{ data: FilmModel }> {
+  public async GetOne(
+    @Param('id') id: number,
+    @Headers('authorization') authToken: string,
+  ): Promise<{ data: FilmModel }> {
     try {
+      await verifyToken(authToken);
+
       const film = await this.model.findOne({ where: { id } });
 
       if (!film) {
@@ -50,8 +60,12 @@ export class FilmController {
   }
 
   @Get()
-  public async getAll(): Promise<{ data: FilmModel[] }> {
+  public async getAll(
+    @Headers('authorization') authToken: string,
+  ): Promise<{ data: FilmModel[] }> {
     try {
+      await verifyToken(authToken);
+
       const films = await this.model.find();
 
       if (films.length === 0) throw new NotFoundException('Films not found');
@@ -66,8 +80,11 @@ export class FilmController {
   public async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() film: FilmModel,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: FilmModel }> {
     try {
+      await verifyToken(authToken);
+
       const filmToUpdate = await this.model.findOne({ where: { id } });
 
       if (!filmToUpdate) throw new NotFoundException('Film not found');
@@ -85,8 +102,11 @@ export class FilmController {
   @Delete(':id')
   public async delete(
     @Param('id', ParseIntPipe) id: number,
+    @Headers('authorization') authToken: string,
   ): Promise<{ data: string }> {
     try {
+      await verifyToken(authToken);
+
       const filmToDelete = await this.model.findOne({ where: { id } });
 
       if (!filmToDelete) throw new NotFoundException('Film not found');
