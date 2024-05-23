@@ -4,13 +4,21 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateUserDto,
@@ -18,10 +26,11 @@ import {
   UserResponseDto,
 } from 'src/dtos/user.dto';
 import { UserModel } from 'src/models/user.model';
-import { verifyToken } from 'src/utils/bearer.util';
+import { AuthGuard } from 'src/utils/auth.guard';
 import { hashPassword } from 'src/utils/hash.util';
 import { Repository } from 'typeorm';
 
+@ApiTags('user')
 @Controller('/user')
 export class UserController {
   constructor(
@@ -29,6 +38,12 @@ export class UserController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Save a new user' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
   public async create(
     @Body() createUserDto: CreateUserDto,
   ): Promise<{ data: UserResponseDto }> {
@@ -55,13 +70,18 @@ export class UserController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiParam({ name: 'id', required: true, description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the user.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
   public async getOne(
     @Param('id') id: number,
-    @Headers('authorization') authToken: string,
   ): Promise<{ data: UserResponseDto }> {
     try {
-      await verifyToken(authToken);
-
       const user = await this.model.findOne({ where: { id } });
 
       if (!user) throw new NotFoundException('User not found');
@@ -75,12 +95,15 @@ export class UserController {
   }
 
   @Get()
-  public async getAll(
-    @Headers('authorization') authToken: string,
-  ): Promise<{ data: UserResponseDto[] }> {
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all users.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
+  public async getAll(): Promise<{ data: UserResponseDto[] }> {
     try {
-      await verifyToken(authToken);
-
       const users = await this.model.find();
 
       if (users.length === 0) throw new NotFoundException('Users not found');
@@ -97,14 +120,20 @@ export class UserController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update an user' })
+  @ApiParam({ name: 'id', description: 'User ID', type: Number })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
   public async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @Headers('authorization') authToken: string,
   ): Promise<{ data: UserResponseDto }> {
     try {
-      await verifyToken(authToken);
-
       const userToUpdate = await this.model.findOne({ where: { id } });
 
       if (!userToUpdate) throw new NotFoundException('User not found');
@@ -130,13 +159,19 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Delete an user' })
+  @ApiParam({ name: 'id', description: 'User ID', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully deleted.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
+  @UseGuards()
   public async delete(
     @Param('id', ParseIntPipe) id: number,
-    @Headers('authorization') authToken: string,
   ): Promise<{ data: string }> {
     try {
-      await verifyToken(authToken);
-
       const userToDelete = await this.model.findOne({ where: { id } });
 
       if (!userToDelete) throw new NotFoundException('User not found');

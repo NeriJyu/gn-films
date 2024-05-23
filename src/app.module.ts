@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/user.module';
 import { FilmModule } from './modules/film.module';
 import { AuthModule } from './modules/auth.module';
@@ -8,7 +8,8 @@ import { AuthModule } from './modules/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.development.local', 'env.development'],
+      envFilePath: ['.env'],
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

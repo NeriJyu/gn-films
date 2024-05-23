@@ -4,19 +4,29 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateFilmDto } from 'src/dtos/film.dto';
+import { CreateFilmDto, FilmResponseDto, UpdateFilmDto } from 'src/dtos/film.dto';
 import { FilmModel } from 'src/models/film.model';
-import { verifyToken } from 'src/utils/bearer.util';
+import { AuthGuard } from 'src/utils/auth.guard';
+import { teste } from 'src/utils/bearer.util';
 import { Repository } from 'typeorm';
 
+@ApiTags('film')
 @Controller('/film')
 export class FilmController {
   constructor(
@@ -24,13 +34,18 @@ export class FilmController {
   ) {}
 
   @Post()
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Save a new film' })
+  @ApiBody({ type: CreateFilmDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The film has been successfully created.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
   public async create(
     @Body() createFilmDto: CreateFilmDto,
-    @Headers('authorization') authToken: string,
-  ): Promise<{ data: FilmModel }> {
+  ): Promise<{ data: FilmResponseDto }> {
     try {
-      await verifyToken(authToken);
-
       const filmCreated = await this.model.save(createFilmDto);
 
       return { data: filmCreated };
@@ -40,13 +55,18 @@ export class FilmController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get film by ID' })
+  @ApiParam({ name: 'id', required: true, description: 'Film ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the film.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
   public async GetOne(
     @Param('id') id: number,
-    @Headers('authorization') authToken: string,
-  ): Promise<{ data: FilmModel }> {
+  ): Promise<{ data: FilmResponseDto }> {
     try {
-      await verifyToken(authToken);
-
       const film = await this.model.findOne({ where: { id } });
 
       if (!film) {
@@ -60,12 +80,15 @@ export class FilmController {
   }
 
   @Get()
-  public async getAll(
-    @Headers('authorization') authToken: string,
-  ): Promise<{ data: FilmModel[] }> {
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Get all films' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return all films.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
+  public async getAll(): Promise<{ data: FilmResponseDto[] }> {
     try {
-      await verifyToken(authToken);
-
       const films = await this.model.find();
 
       if (films.length === 0) throw new NotFoundException('Films not found');
@@ -77,14 +100,20 @@ export class FilmController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Update a film' })
+  @ApiParam({ name: 'id', description: 'Film ID', type: Number })
+  @ApiBody({ type: UpdateFilmDto })
+  @ApiResponse({
+    status: 200,
+    description: 'The film has been successfully updated.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
   public async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() film: FilmModel,
-    @Headers('authorization') authToken: string,
-  ): Promise<{ data: FilmModel }> {
+    @Body() film: UpdateFilmDto,
+  ): Promise<{ data: FilmResponseDto }> {
     try {
-      await verifyToken(authToken);
-
       const filmToUpdate = await this.model.findOne({ where: { id } });
 
       if (!filmToUpdate) throw new NotFoundException('Film not found');
@@ -100,13 +129,19 @@ export class FilmController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Delete a film' })
+  @ApiParam({ name: 'id', description: 'Film ID', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'The film has been successfully deleted.',
+  })
+  @ApiBearerAuth('KEY_AUTH')
+  @UseGuards()
   public async delete(
     @Param('id', ParseIntPipe) id: number,
-    @Headers('authorization') authToken: string,
   ): Promise<{ data: string }> {
     try {
-      await verifyToken(authToken);
-
       const filmToDelete = await this.model.findOne({ where: { id } });
 
       if (!filmToDelete) throw new NotFoundException('Film not found');
