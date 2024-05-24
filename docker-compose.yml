@@ -21,6 +21,9 @@ services:
       - PORT=${PORT}
     ports:
       - '3000:3000'
+    depends_on:
+      - db
+      - redis
     volumes:
       - ./src:/app/src
 
