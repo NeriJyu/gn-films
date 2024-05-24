@@ -12,7 +12,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
   imports: [
     CacheModule.register(),
     ConfigModule.forRoot({
-      envFilePath: ['.env'],
+      envFilePath: ['.env.example', '.env'],
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
