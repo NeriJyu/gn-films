@@ -1,25 +1,26 @@
-# Catálogo de Filmes
+# 🎬 Movie Catalog
 
-## Comandos para rodar
+## Commands to Run ⚙️
 
-```
+```bash
   npm install
   cp .env.example .env
   docker-compose up --build
 ```
 
-## Como utilizar
+## How to Use 🎬
 
-Após executar o projeto com Docker, você pode testar as rotas usando o Swagger ou qualquer aplicativo de teste de APIs. Primeiro, é necessário realizar o cadastro de um usuário. Após o cadastro, faça o login para obter o token de autenticação, que será necessário para acessar as demais rotas.
+After running the project with Docker, you can test the routes using Swagger or any API testing application. First, it is necessary to register a user. After registration, log in to obtain the authentication token, which will be required to access the other routes.
 
-## Urls
+## URLs 🔗
 
 - [Local](http://localhost:3000)
 
-## Documentação em swagger 
+## Swagger Documentation 📖
 
-- GET: /api/docs - Swagger da aplicação.
+- GET: /api/docs - Application Swagger.
 
-## Sobre o desenvolvimento do projeto
+## About Project Development 🧑‍💻
 
-É a primeira vez que estou utilizando Docker, NestJS e Redis. Embora eu seja novo nesses ambientes, já possuo um ano de experiência com outras tecnologias.
+This is my first time using NestJS, and Redis in the same project. Although I am new to these environments.
+```
